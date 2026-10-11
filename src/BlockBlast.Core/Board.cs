@@ -25,7 +25,7 @@ public sealed class Board
     internal ulong Occupancy => occupied;
 
     public Board() { }
-    private Board(ulong occupied) => this.occupied = occupied;
+    internal Board(ulong occupied) => this.occupied = occupied;
     public Board Clone() => new(occupied);
 
     public bool IsOccupied(int row, int column)
