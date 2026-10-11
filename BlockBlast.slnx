@@ -1,0 +1,9 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/BlockBlast.Core/BlockBlast.Core.csproj" />
+    <Project Path="src/BlockBlast.WinForms/BlockBlast.WinForms.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/BlockBlast.Core.Tests/BlockBlast.Core.Tests.csproj" />
+  </Folder>
+</Solution>
