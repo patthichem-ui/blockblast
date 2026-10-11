@@ -1,18 +1,22 @@
 # Block Blast — C# WinForms
 
-Game xếp khối trên bàn **8 × 8**, viết bằng **C# / .NET 10 / Windows Forms**. Đây là bộ luật và thuật toán tự triển khai cho một game kiểu Block Blast; có thể đọc, sửa và dùng làm nền cho dự án của bạn.
+Game xếp khối trên bàn **8 × 8**, viết bằng **C# / .NET 9 / Windows Forms**. Đây là bộ luật và thuật toán tự triển khai cho một game kiểu Block Blast; có thể đọc, sửa và dùng làm nền cho dự án của bạn.
 
 ## Chạy trên Windows
 
-Yêu cầu Windows 10/11 và **.NET 10 SDK**. Mở PowerShell tại thư mục chứa README này:
+Yêu cầu Windows 10/11 và **.NET 9 SDK 9.0.305 hoặc mới hơn trong dòng .NET 9**. SDK **9.0.306** đã được dùng để kiểm tra bản này. `global.json` cho phép dùng phiên bản SDK 9 tương thích đã cài trên máy; không cần cài .NET 10. Mở PowerShell tại thư mục chứa README này:
 
 ```powershell
-dotnet restore BlockBlast.slnx
-dotnet build BlockBlast.slnx -c Release --no-restore
+dotnet restore BlockBlast.sln
+dotnet build BlockBlast.sln -c Release --no-restore
 dotnet run --project src/BlockBlast.WinForms -c Release --no-build
 ```
 
-Hoặc mở `BlockBlast.slnx` bằng Visual Studio có hỗ trợ .NET 10, chọn `BlockBlast.WinForms` làm startup project rồi nhấn F5. Không cần database, khóa API hay thư viện NuGet bên thứ ba.
+Hoặc bấm đúp **`Chay-Game.cmd`** sau khi giải nén source để tự build và mở game bằng SDK .NET 9 đang cài. Lần chạy đầu cần Internet để tải reference pack khi chưa có trong cache.
+
+Hoặc mở `BlockBlast.sln` bằng Visual Studio có hỗ trợ .NET 9, chọn `BlockBlast.WinForms` làm startup project rồi nhấn F5. Không cần database, khóa API hay thư viện NuGet bên thứ ba.
+
+Nếu đã tải bản .NET 10 trước đó, hãy tải lại source trên nhánh `codex/blockblast-winforms` và giải nén vào **thư mục mới**. Nếu dùng Git, cập nhật bằng `git pull` rồi chạy `dotnet restore BlockBlast.sln` trước khi build. Bản cũ có thể giữ `global.json` hoặc output `bin/obj` của .NET 10.
 
 WinForms chạy trên Windows. Engine và bộ kiểm thử chạy được trên Windows, Linux và macOS.
 
@@ -110,7 +114,7 @@ Runner in số ca đã chạy, số ca đạt/thất bại và trả exit code k
 ## Xuất bản bản chạy Windows
 
 ```powershell
-dotnet publish src/BlockBlast.WinForms -c Release -r win-x64 --self-contained true -o artifacts/windows
+dotnet publish src/BlockBlast.WinForms -c Release -r win-x64 --self-contained true -o artifacts/windows-net9
 ```
 
-Chạy `artifacts/windows/BlockBlast.WinForms.exe`. Bản self-contained chứa runtime nên máy người chơi không cần cài SDK. Muốn hỗ trợ Windows ARM64, đổi `win-x64` thành `win-arm64`.
+Chạy `artifacts/windows-net9/BlockBlast.WinForms.exe`. Bản self-contained chứa runtime .NET 9 nên máy người chơi không cần cài SDK. Muốn hỗ trợ Windows ARM64, đổi `win-x64` thành `win-arm64`.
