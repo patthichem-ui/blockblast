@@ -10,5 +10,6 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="../BlockBlast.Core/BlockBlast.Core.csproj" />
+    <ProjectReference Include="../BlockBlast.Application/BlockBlast.Application.csproj" />
   </ItemGroup>
 </Project>

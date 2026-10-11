@@ -1,44 +1,50 @@
 using System.Diagnostics;
 using BlockBlast.Core;
 
-// A dependency-free executable suite: a failed assertion makes the process exit nonzero.
-var suite = new (string Name, Action Test)[]
+internal static class Program
 {
-    ("Shape catalog is normalized, unique, connected, and fits the board", Tests.ShapeCatalogIntegrity),
-    ("Custom shapes normalize coordinates and reject invalid definitions", Tests.ShapeConstruction),
-    ("Placement respects edges, collisions, cloning, and atomic failures", Tests.PlacementRules),
-    ("Rows and columns clear simultaneously without counting intersections twice", Tests.SimultaneousClearing),
-    ("Scoring rewards placement, multiple lines, combo, and difficulty", Tests.Scoring),
-    ("Difficulty progresses monotonically and stays within its limits", Tests.Difficulty),
-    ("Tray solver proves a full sequence and rejects impossible trays", Tests.Solver),
-    ("Generated trays have replayable solutions on fragmented boards", Tests.GeneratedTrayCertificates),
-    ("Exhausting a tiny search budget still produces a playable fallback tray", Tests.FallbackCertificates),
-    ("Generation is reproducible with a fixed seed", Tests.SeededGeneration),
-    ("Tray slots are consumed once and refill after the third piece", Tests.TrayLifecycle),
-    ("Invalid moves preserve every part of game state", Tests.InvalidMoves),
-    ("Clearing moves extend combo and a quiet move resets it", Tests.ComboLifecycle),
-    ("The move crossing a difficulty threshold uses its previous level", Tests.ScoreThreshold),
-    ("A blocked remaining tray ends the game and reset starts a fresh game", Tests.GameOver),
-    ("Seeded gameplay reproduces board, tray, score, and progression", Tests.SeededReplay)
-};
+    private static int Main()
+    {
+        // A dependency-free executable suite: a failed assertion makes the process exit nonzero.
+        var suite = new (string Name, Action Test)[]
+        {
+            ("Shape catalog is normalized, unique, connected, and fits the board", Tests.ShapeCatalogIntegrity),
+            ("Custom shapes normalize coordinates and reject invalid definitions", Tests.ShapeConstruction),
+            ("Placement respects edges, collisions, cloning, and atomic failures", Tests.PlacementRules),
+            ("Rows and columns clear simultaneously without counting intersections twice", Tests.SimultaneousClearing),
+            ("Scoring rewards placement, multiple lines, combo, and difficulty", Tests.Scoring),
+            ("Difficulty progresses monotonically and stays within its limits", Tests.Difficulty),
+            ("Tray solver proves a full sequence and rejects impossible trays", Tests.Solver),
+            ("Generated trays have replayable solutions on fragmented boards", Tests.GeneratedTrayCertificates),
+            ("Exhausting a tiny search budget still produces a playable fallback tray", Tests.FallbackCertificates),
+            ("Generation is reproducible with a fixed seed", Tests.SeededGeneration),
+            ("Tray slots are consumed once and refill after the third piece", Tests.TrayLifecycle),
+            ("Invalid moves preserve every part of game state", Tests.InvalidMoves),
+            ("Clearing moves extend combo and a quiet move resets it", Tests.ComboLifecycle),
+            ("The move crossing a difficulty threshold uses its previous level", Tests.ScoreThreshold),
+            ("A blocked remaining tray ends the game and reset starts a fresh game", Tests.GameOver),
+            ("Seeded gameplay reproduces board, tray, score, and progression", Tests.SeededReplay)
+        }.Concat(StateTests.Cases).ToArray();
 
-int passed = 0;
-var elapsed = Stopwatch.StartNew();
-foreach (var (name, test) in suite)
-{
-    try
-    {
-        test();
-        passed++;
-        Console.WriteLine($"PASS {name}");
-    }
-    catch (Exception exception)
-    {
-        Console.Error.WriteLine($"FAIL {name}: {exception}");
+        int passed = 0;
+        var elapsed = Stopwatch.StartNew();
+        foreach (var (name, test) in suite)
+        {
+            try
+            {
+                test();
+                passed++;
+                Console.WriteLine($"PASS {name}");
+            }
+            catch (Exception exception)
+            {
+                Console.Error.WriteLine($"FAIL {name}: {exception}");
+            }
+        }
+        Console.WriteLine($"{passed}/{suite.Length} tests passed in {elapsed.Elapsed.TotalSeconds:F2}s.");
+        return passed == suite.Length ? 0 : 1;
     }
 }
-Console.WriteLine($"{passed}/{suite.Length} tests passed in {elapsed.Elapsed.TotalSeconds:F2}s.");
-return passed == suite.Length ? 0 : 1;
 
 internal static class Tests
 {

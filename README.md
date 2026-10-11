@@ -1,6 +1,17 @@
-# Block Blast — C# WinForms
+# Block Blast · Sticker Studio — C# WinForms
 
 Game xếp khối trên bàn **8 × 8**, viết bằng **C# / .NET 9 / Windows Forms**. Đây là bộ luật và thuật toán tự triển khai cho một game kiểu Block Blast; có thể đọc, sửa và dùng làm nền cho dự án của bạn.
+
+## Bản nâng cấp Sticker Studio
+
+- **Đóng rồi mở lại vẫn tiếp tục đúng ván:** lưu bàn chơi, ba khối còn lại, điểm, combo, cấp độ, màu/sticker từng ô, lịch sử hoàn tác và trạng thái sinh khối tiếp theo.
+- **4 theme nền:** Cực quang, Kẹo ngọt, Đại dương, Hoàng hôn; **3 bộ sticker vẽ vector:** Kawaii (mèo/thỏ), Cosmic (sao/trăng), Garden (hoa).
+- Khối bo góc có ánh sáng, hình xem trước khi kéo thả, hạt sao khi xóa hàng, điểm nổi và thông báo combo; giao diện tự bố trí theo kích thước cửa sổ.
+- Nhạc nền tổng hợp riêng và tiếng đặt/xóa khối, combo, hoàn tác, kết thúc ván. Có thể bật/tắt **riêng** nhạc, âm thanh, hiệu ứng chuyển động và sticker; có thanh âm lượng chung. Không cần tải file nhạc từ mạng.
+- **3 lần hoàn tác mỗi ván**, gợi ý vị trí đặt hợp lệ, tạm dừng/tiếp tục, thống kê thành tích và thời gian chơi. Chuyển sang ứng dụng khác hoặc thu nhỏ cửa sổ sẽ tự tạm dừng.
+- Giao diện, luật chơi, lưu trữ và âm thanh được tách thành các lớp có trách nhiệm riêng; các dịch vụ có thể thay bằng implementation khác qua interface.
+
+Đây là game desktop độc lập lấy cảm hứng từ cách chơi xếp khối, không phải source hoặc tài nguyên của ứng dụng thương mại trên CH Play. Bản hiện tại tập trung vào chơi offline; chưa có tài khoản, đồng bộ đám mây hay bảng xếp hạng online.
 
 ## Chạy trên Windows
 
@@ -24,21 +35,49 @@ WinForms chạy trên Windows. Engine và bộ kiểm thử chạy được trê
 
 - Kéo một trong ba khối ở khay xuống bàn; hình xem trước cho biết vị trí có hợp lệ không.
 - Có thể bấm chọn khối rồi bấm ô trên bàn. Điểm neo là ô góc trên bên trái của hình chữ nhật bao khối.
-- Phím `1`, `2`, `3` chọn khối; phím mũi tên và `Enter` dùng để đặt bằng bàn phím; `Esc` hủy chọn; `R` chơi lại.
+- Phím `1`, `2`, `3` chọn khối; mũi tên chọn ô; `Enter`/`Space` đặt; `Esc` hủy chọn; `H` gợi ý; `Ctrl+Z` hoàn tác; `P` tạm dừng/tiếp tục; `R` ván mới; `F1` hướng dẫn. `Esc` khi chưa chọn khối cũng tạm dừng/tiếp tục.
 - Khối không được chồng lên ô đã có hoặc vượt ra ngoài bàn. Khối đã sinh giữ nguyên hướng, không xoay trong lượt chơi.
 - Hàng và cột đầy được xóa **đồng thời**. Ô giao nhau chỉ được xóa một lần nhưng cả hàng và cột đều được tính điểm.
 - Dùng hết cả ba khối mới nhận khay tiếp theo. Game kết thúc khi **mọi khối còn lại** đều không có vị trí đặt hợp lệ.
-- Điểm cao nhất được lưu trong thư mục dữ liệu ứng dụng của tài khoản Windows, không ghi vào source code.
+- Bấm **Tùy chỉnh** để đổi theme, sticker và âm thanh; bấm **Thống kê** để xem kỷ lục, combo tốt nhất, tổng khối/hàng đã xóa và thời gian chơi.
+- Khi game over vẫn có thể hoàn tác nếu còn lượt. Gợi ý không đặt khối thay bạn; bấm `Enter` hoặc chọn vị trí khác để tiếp tục.
+
+## Lưu tiến độ và cài đặt
+
+Dữ liệu nằm trong **`%LOCALAPPDATA%\BlockBlast`** của tài khoản Windows hiện tại, dùng chung khi bạn chuyển source sang thư mục mới:
+
+| Tệp | Nội dung |
+| --- | --- |
+| `session.json` | Ván chơi, cài đặt, thống kê, lịch sử và lượt hoàn tác còn lại |
+| `session.json.bak` | Bản lưu hợp lệ trước lần ghi gần nhất |
+| `*.corrupt-*` | Bản dữ liệu hỏng được giữ lại để kiểm tra khi phát hiện lỗi |
+
+Game tự lưu sau mỗi lượt đặt thành công, hoàn tác, tạo ván mới, đổi cài đặt, tạm dừng/tiếp tục; đồng thời lưu mỗi 30 giây và khi đóng cửa sổ. Khi mở lại sau lần đóng bình thường, bấm **Tiếp tục** hoặc `P` để chơi tiếp. Không tính thời gian khi tạm dừng, game over hoặc ứng dụng đã đóng.
+
+Tệp mới được ghi vào file tạm và flush trước khi thay thế bản chính; bản chính lỗi sẽ được thử khôi phục từ backup. Nếu máy không ghi được dữ liệu, giao diện thông báo lỗi và hỏi trước khi thoát để tránh mất các lượt chưa lưu. Mỗi phiên đăng nhập Windows chỉ mở một cửa sổ game để tránh hai phiên ghi đè tiến độ của nhau.
+
+Kỷ lục từ `highscore.json` của bản cũ được đọc và giữ lại. Kỷ lục, tổng số lượt đặt/xóa hàng và combo tốt nhất không bị trừ khi hoàn tác; số ván kết thúc chỉ tính một lần cho mỗi ván, kể cả khi hoàn tác rồi game over lần nữa. Tạo ván mới thay thế ván hiện tại, giữ lại thống kê và cài đặt.
 
 ## Cấu trúc source
 
 ```text
-src/BlockBlast.Core/          Bàn chơi, hình khối, sinh khay, điểm và độ khó
-src/BlockBlast.WinForms/      Giao diện, tương tác và lưu điểm cao
-tests/BlockBlast.Core.Tests/  Bộ kiểm thử console, không cần thư viện test ngoài
+src/BlockBlast.Core/                  Luật chơi, sinh khay, điểm/độ khó, snapshot, undo
+src/BlockBlast.Application/           Điều phối phiên chơi, lưu trữ, cài đặt, thống kê
+src/BlockBlast.WinForms/
+  MainForm.cs                        Vòng đời cửa sổ và điều phối lệnh
+  GameSurface*.cs                     Canvas, vẽ bảng, kéo thả và bàn phím
+  Controls/ · Dialogs/                Nút, công tắc, tùy chỉnh, thống kê, hướng dẫn
+  Rendering/ · Themes/ · Effects/     Vẽ vector, bố cục, palette và hoạt ảnh
+  Audio/                             Tổng hợp PCM, trộn nhạc/hiệu ứng, thiết bị WinMM
+tests/BlockBlast.Core.Tests/          Luật, solver, trạng thái lưu/undo và RNG
+tests/BlockBlast.Application.Tests/   Tệp lưu, phục hồi, thống kê và vòng đời phiên
+tests/BlockBlast.Audio.Tests/         PCM, mixer và bật/tắt âm thanh
+tests/BlockBlast.Presentation.Tests/  Bố cục, khay và ánh xạ con trỏ ở nhiều DPI
 ```
 
-Engine tách khỏi giao diện để bạn có thể dùng lại trong một giao diện C# khác.
+`GameEngine` sở hữu trạng thái và chỉ áp dụng luật chơi. `GameSessionController` điều phối engine, thống kê và tự lưu thông qua `IGameRepository`; `JsonGameRepository` chịu trách nhiệm ghi/đọc dữ liệu. `MainForm` và `GameSurface` gọi controller, không tự tính điểm hay sửa bàn chơi. `IGameAudio` tách giao diện khỏi thiết bị âm thanh; `GameAudioService`, `AudioMixer`, `PcmComposer` và `WaveOutDevice` tách điều phối, trộn âm, tạo âm và phát âm.
+
+Core/Application không phụ thuộc WinForms, nên có thể kiểm thử độc lập và dùng lại cho giao diện C# khác. `TimeProvider` có thể được truyền vào controller để kiểm thử thời gian mà không phải chờ thật.
 
 ## Logic tính điểm
 
@@ -80,7 +119,7 @@ Các bước chính nằm trong `PieceGenerator.Generate`:
 
 Khay mới luôn có ít nhất **một cách dùng hết ba khối**. Người chơi vẫn có thể chọn một vị trí khác làm khối còn lại không đặt được. Không sinh lại khay giữa chừng để cứu lượt chơi.
 
-`GameEngine.LastGeneration` cho biết số lần thử, số trạng thái đã duyệt, có dùng dự phòng không và lời giải. Không hiển thị lời giải trong giao diện người chơi. `GameEngine.Seed` cùng chuỗi nước đi cho phép tái hiện một ván trong cùng phiên bản engine/runtime:
+`GameEngine.LastGeneration` cho biết số lần thử, số trạng thái đã duyệt, có dùng dự phòng không và lời giải. Nút gợi ý tìm một nước đi hợp lệ trong khay hiện tại, ưu tiên một lời giải dùng hết khay khi solver tìm được. `GameEngine.Seed` cùng chuỗi nước đi cho phép tái hiện ván trong cùng phiên bản engine; `StatefulRandom` lưu trạng thái RNG để mở lại hoặc hoàn tác không làm đổi các khối sắp sinh:
 
 ```csharp
 var game = new GameEngine(seed: 2026);
@@ -107,14 +146,19 @@ Bàn chơi dùng `ulong` gồm 64 bit, mỗi bit là một ô. Các mask đặt 
 
 ```powershell
 dotnet run --project tests/BlockBlast.Core.Tests -c Release
+dotnet run --project tests/BlockBlast.Application.Tests -c Release
+dotnet run --project tests/BlockBlast.Audio.Tests -c Release
+dotnet run --project tests/BlockBlast.Presentation.Tests -c Release
 ```
 
-Runner in số ca đã chạy, số ca đạt/thất bại và trả exit code khác 0 khi có lỗi. Có thể kiểm thử engine trên Linux; việc mở cửa sổ, kéo thả thực tế và kiểm tra DPI cần Windows.
+Các runner console không cần thư viện test ngoài, in số ca đạt/thất bại và trả exit code khác 0 khi có lỗi. Core kiểm tra xóa giao hàng/cột, combo, độ khó, ngân sách solver, khay có nghiệm, snapshot và hoàn tác qua lượt sinh khay. Application kiểm tra đọc lại sau khi khởi động tiến trình mới, file hỏng/backup, quyền ghi, di chuyển kỷ lục, cài đặt và thời gian tạm dừng. Audio kiểm tra mẫu âm hợp lệ, phát đồng thời nhạc/hiệu ứng và các công tắc độc lập. Presentation kiểm tra hình học bố cục ở nhiều kích thước/DPI, khối nằm gọn trong khay và tọa độ con trỏ khớp ô vẽ.
+
+Build và các kiểm thử này chạy được trên Linux. Chúng không thay thế việc mở cửa sổ và nghe loa trên Windows; checklist kiểm tra thực tế nằm trong [docs/Kiem-tra-Windows.md](docs/Kiem-tra-Windows.md).
 
 ## Xuất bản bản chạy Windows
 
 ```powershell
-dotnet publish src/BlockBlast.WinForms -c Release -r win-x64 --self-contained true -o artifacts/windows-net9
+dotnet publish src/BlockBlast.WinForms -c Release -r win-x64 --self-contained true -o artifacts/windows-deluxe-net9
 ```
 
-Chạy `artifacts/windows-net9/BlockBlast.WinForms.exe`. Bản self-contained chứa runtime .NET 9 nên máy người chơi không cần cài SDK. Muốn hỗ trợ Windows ARM64, đổi `win-x64` thành `win-arm64`.
+Chạy `artifacts/windows-deluxe-net9/BlockBlast.WinForms.exe`. Gửi **toàn bộ thư mục publish**, không chỉ file EXE. Bản self-contained chứa runtime .NET 9 nên máy người chơi không cần cài SDK. Muốn hỗ trợ Windows ARM64, đổi `win-x64` thành `win-arm64`.
